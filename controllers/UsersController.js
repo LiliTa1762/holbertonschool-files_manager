@@ -1,5 +1,5 @@
-import dbClient from '../utils/db';
 import sha1 from 'sha1';
+import dbClient from '../utils/db';
 
 class UsersController {
   static async postNew(req, res) {
@@ -7,25 +7,27 @@ class UsersController {
     const password = req.body;
 
     if (!email) {
-      return res.status(400).send({error: 'Missing email'});
+      return res.status(400).json({ error: 'Missing email' });
     }
     if (!password) {
-      return res.status(400).send({error: 'Missing password'});
+      return res.status(400).json({ error: 'Missing password' });
     }
 
     let user = await dbClient.findUser({ email });
 
     if (user) {
-      return res.status(400).send({error: 'Already exist'});
+      return res.status(400).json({ error: 'Already exist' });
     }
 
     const hashPassword = sha1(password);
 
-    user= await dbClient.users.insertOne({
+    user = await dbClient.createUser({
       email,
       password: hashPassword,
     });
 
     return res.json(user);
-  };
+  }
 }
+
+export default UsersController;
